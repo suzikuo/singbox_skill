@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sing-box Ops"
+  short_description: "Inspect sing-box configs and export share links or Clash subscriptions."
+  default_prompt: "Use $sing-box-ops to inspect my sing-box JSON files and export client-ready node links."
+
+policy:
+  allow_implicit_invocation: true
