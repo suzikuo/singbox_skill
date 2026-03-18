@@ -204,11 +204,13 @@ def main() -> int:
     proxies: list[dict] = []
 
     for node in nodes:
-        server = resolve_server(node, args.server, args.auto_ip)
-        proxy = build_proxy(node, server)
-        if proxy:
-            proxies.append(proxy)
-
+        try:
+            server = resolve_server(node, args.server, args.auto_ip)
+            proxy = build_proxy(node, server)
+            if proxy:
+                proxies.append(proxy)
+        except Exception as e:
+            print("foreach node error: {}".format(e))
     config = build_config(proxies)
     rendered = dump_yaml(config)
 
