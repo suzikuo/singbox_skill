@@ -15,6 +15,7 @@ Use the bundled scripts instead of rewriting exporters:
 
 - Share links: `python scripts/export_node_links.py --conf-dir /etc/sing-box/conf --server example.com --output ./node.txt`
 - Clash config: `python scripts/export_clash.py --conf-dir /etc/sing-box/conf --server example.com --output ./clash.yaml --base64-output ./clash_base64.txt`
+- Subscription server: `python scripts/serve_subscription.py --server yourdomain.com --token <TOKEN> --port 8080` (Provides a link like `http://example.com:8080/sabusuku?token=<TOKEN>`)
 
 Pass `--server` whenever the JSON files do not already imply the public endpoint. If `tls.server_name` is present, the scripts use it as a fallback. Add `--auto-ip` only when an external IP lookup is acceptable.
 
@@ -34,6 +35,7 @@ Prefer explicit failure or warnings over silent field loss. If a protocol or fie
 - Shared parser helpers: `scripts/singbox_reader.py`
 - Share-link exporter: `scripts/export_node_links.py`
 - Clash exporter: `scripts/export_clash.py`
+- Subscription server: `scripts/serve_subscription.py`
 
 ## Troubleshooting
 
