@@ -119,6 +119,9 @@ def main() -> int:
     parser.add_argument(
         "--token", required=True, help="token required for the /sabusuku endpoint"
     )
+    parser.add_argument(
+        "-f", "--foreground", action="store_true", help="run server in foreground"
+    )
 
     args = parser.parse_args()
 
@@ -126,9 +129,35 @@ def main() -> int:
     public_server = discover_public_ip()
     if not public_server:
         print(
-            "Warning: Could not detect public IP. You might need to specify --server manually.",
+            "Warning: Could not detect public IP. Links might use internal or missing IPs.",
             file=sys.stderr,
         )
+
+    domain = public_server if public_server else args.host
+    url = f"http://{domain}:{args.port}/sabusuku?token={args.token}"
+
+    if not args.foreground:
+        # Run in background
+        import subprocess
+
+        cmd_args = [sys.executable, sys.argv[0], "--foreground"]
+        cmd_args.extend(arg for arg in sys.argv[1:] if arg not in ("-f", "--foreground"))
+
+        if sys.platform == "win32":
+            CREATE_NO_WINDOW = 0x08000000
+            subprocess.Popen(cmd_args, creationflags=CREATE_NO_WINDOW)
+        else:
+            subprocess.Popen(
+                cmd_args,
+                start_new_session=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+
+        print("Subscription server started in background.")
+        print(f"URL: {url}")
+        print(f"Clash: {url}&format=clash")
+        return 0
 
     server = SubscriptionServer(
         (args.host, args.port),
@@ -139,8 +168,6 @@ def main() -> int:
         True,  # auto_ip enabled by default as fallback inside resolve_server
     )
 
-    domain = public_server if public_server else args.host
-    url = f"http://{domain}:{args.port}/sabusuku?token={args.token}"
     print(f"Starting subscription server on {url}")
     try:
         server.serve_forever()

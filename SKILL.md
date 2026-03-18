@@ -7,6 +7,7 @@ description: Inspect, explain, repair, and export sing-box server configurations
 
 > [!IMPORTANT]
 > **AVAILABLE SCRIPTS (USE THESE FIRST instead of rewriting exporters)**:
+> ⚠️ **CRITICAL PATH INSTRUCTION**: These scripts are located in the `scripts/` directory relative to this `SKILL.md` file. Because your working directory may be different, you **MUST use their absolute paths** (or `cd` into this skill's directory) when executing them!
 > - `scripts/export_node_links.py`: Export sing-box nodes as standard v2ray-style links.
 > - `scripts/export_clash.py`: Export sing-box nodes as a Clash/Meta YAML profile.
 > - `scripts/serve_subscription.py`: Run an HTTP server to provide live subscription URLs. Supports both standard V2Ray links (default) and Clash/Meta profiles (`?format=clash` or via Clash User-Agent).
@@ -19,9 +20,9 @@ Start by listing config files and reading one or two representative JSON files b
 
 Use the bundled scripts instead of rewriting exporters:
 
-- Share links: `python scripts/export_node_links.py --conf-dir /etc/sing-box/conf --server example.com --output ./node.txt`
-- Clash config: `python scripts/export_clash.py --conf-dir /etc/sing-box/conf --server example.com --output ./clash.yaml --base64-output ./clash_base64.txt`
-- Subscription server: `python scripts/serve_subscription.py --token <TOKEN> --port 8080` (Auto-detects IP. Link: `http://<IP>:8080/sabusuku?token=<TOKEN>` or append `&format=clash` for Clash profiles)
+- Share links: `python /absolute/path/to/skill/scripts/export_node_links.py --conf-dir /etc/sing-box/conf --server example.com --output ./node.txt`
+- Clash config: `python /absolute/path/to/skill/scripts/export_clash.py --conf-dir /etc/sing-box/conf --server example.com --output ./clash.yaml --base64-output ./clash_base64.txt`
+- Subscription server: `python /absolute/path/to/skill/scripts/serve_subscription.py --token <TOKEN> --port 8080` (Auto-detects IP. Link: `http://<IP>:8080/sabusuku?token=<TOKEN>` or append `&format=clash` for Clash profiles)
 
 Pass `--server` whenever the JSON files do not already imply the public endpoint. If `tls.server_name` is present, the scripts use it as a fallback. Add `--auto-ip` only when an external IP lookup is acceptable.
 
