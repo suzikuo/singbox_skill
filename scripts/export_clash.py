@@ -21,8 +21,6 @@ def compact_options(values: dict) -> dict:
     for key, value in values.items():
         if value is None:
             continue
-        if value == "":
-            continue
         if value is False:
             continue
         if isinstance(value, list) and not value:

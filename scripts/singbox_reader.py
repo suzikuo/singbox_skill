@@ -30,7 +30,7 @@ def load_nodes(conf_dir: str) -> list[dict[str, Any]]:
         inbounds = data.get("inbounds") or []
         if not inbounds:
             continue
-        nodes.append(normalize_node(path, inbounds[0]))
+        nodes.append(normalize_node(path, inbounds[0], data))
 
     if not nodes:
         raise ExportError(f"no json configs found in: {conf_path}")
@@ -38,7 +38,7 @@ def load_nodes(conf_dir: str) -> list[dict[str, Any]]:
     return nodes
 
 
-def normalize_node(path: Path, inbound: dict[str, Any]) -> dict[str, Any]:
+def normalize_node(path: Path, inbound: dict[str, Any], full_data: dict[str, Any] = None) -> dict[str, Any]:
     users = inbound.get("users") or [{}]
     user = users[0] if users else {}
     tls = inbound.get("tls") or {}
@@ -48,6 +48,19 @@ def normalize_node(path: Path, inbound: dict[str, Any]) -> dict[str, Any]:
     utls = tls.get("utls") or {}
     obfs = inbound.get("obfs") or {}
     alpn = tls.get("alpn") or []
+
+    public_key = reality.get("public_key")
+    if not public_key and bool(reality) and full_data:
+        outbounds = full_data.get("outbounds") or []
+        for out in outbounds:
+            tag = out.get("tag", "")
+            if tag.startswith("public_key_"):
+                public_key = tag[len("public_key_"):]
+                break
+
+    short_id = reality.get("short_id") or reality.get("short-id")
+    if isinstance(short_id, list) and short_id:
+        short_id = short_id[0]
 
     return {
         "name": path.stem,
@@ -60,17 +73,17 @@ def normalize_node(path: Path, inbound: dict[str, Any]) -> dict[str, Any]:
             tls.get("insecure") or tls.get("skip_cert_verify") or tls.get("skip-cert-verify")
         ),
         "reality_enabled": bool(reality),
-        "public_key": reality.get("public_key"),
-        "short_id": reality.get("short_id") or reality.get("short-id"),
+        "public_key": public_key,
+        "short_id": short_id,
         "fingerprint": utls.get("fingerprint"),
         "network": transport.get("type") or "tcp",
-        "path": transport.get("path") or "",
+        "path": transport.get("path") or "/",
         "host": transport.get("host") or headers.get("Host") or headers.get("host"),
         "service_name": transport.get("service_name") or transport.get("serviceName"),
         "method": inbound.get("method"),
         "uuid": user.get("uuid"),
-        "password": user.get("password"),
-        "username": user.get("username"),
+        "password": user.get("password") or inbound.get("password"),
+        "username": user.get("username") or inbound.get("username"),
         "flow": user.get("flow"),
         "congestion_control": inbound.get("congestion_control"),
         "udp_relay_mode": inbound.get("udp_relay_mode"),
@@ -121,8 +134,6 @@ def clean_params(params: dict[str, Any]) -> dict[str, str]:
     result: dict[str, str] = {}
     for key, value in params.items():
         if value is None:
-            continue
-        if value == "":
             continue
         if value is False:
             continue
