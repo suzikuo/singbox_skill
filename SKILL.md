@@ -1,16 +1,15 @@
 ---
 name: sing-box-ops
-description: Inspect, explain, repair, and export sing-box server configurations, especially 233boy-style deployments that store inbound JSON files under /etc/sing-box/conf. Use when Codex needs to read sing-box config files, map protocol fields, generate share links, export Clash or Clash Meta subscriptions, troubleshoot TLS or REALITY transport settings, or document how a sing-box node should be consumed by clients.
+description: Inspect, explain, repair, and export sing-box server configurations, especially 233boy-style deployments that store inbound JSON files under /etc/sing-box/conf. Use when Codex needs to read sing-box config files, map protocol fields, generate share links, export Clash or Clash Meta subscriptions, troubleshoot TLS or REALITY transport settings, or document how a sing-box node should be consumed by clients.some scripts in ./scripts/
 ---
 
 # Sing-box workflow
 
-> [!IMPORTANT]
 > **AVAILABLE SCRIPTS (USE THESE FIRST instead of rewriting exporters)**:
-> ⚠️ **CRITICAL PATH INSTRUCTION**: These scripts are located in the `scripts/` directory relative to this `SKILL.md` file. Because your working directory may be different, you **MUST use their absolute paths** (or `cd` into this skill's directory) when executing them!
+>  **CRITICAL PATH INSTRUCTION**: These scripts are located in the `scripts/` directory relative to this `SKILL.md` file. Because your working directory may be different, you **MUST use their absolute paths** (or `cd` into this skill's directory) when executing them!
 > - `scripts/export_node_links.py`: Export sing-box nodes as standard v2ray-style links.
 > - `scripts/export_clash.py`: Export sing-box nodes as a Clash/Meta YAML profile.
-> - `scripts/serve_subscription.py`: Run an HTTP server to provide live subscription URLs. Supports both standard V2Ray links (default) and Clash/Meta profiles (`?format=clash` or via Clash User-Agent).
+> - `scripts/serve_subscription.py`: Run an HTTP server to provide live subscription URLs. Supports both standard V2Ray links (default) and Clash/Meta profiles (`?format=clash` or via Clash User-Agent).and return dict:{"url": url, "clash": f"{url}&format=clash"}
 
 Treat each `*.json` file in `/etc/sing-box/conf` as one inbound node unless the user shows a different layout.
 

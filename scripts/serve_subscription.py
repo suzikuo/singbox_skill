@@ -35,14 +35,12 @@ class SubscriptionHandler(BaseHTTPRequestHandler):
             is_clash = fmt == "clash" or "clash" in user_agent or "meta" in user_agent
 
             nodes = load_nodes(self.server.conf_dir)
-            
+
             if is_clash:
                 proxies = []
                 for node in nodes:
                     try:
-                        server_ip_or_domain = resolve_server(
-                            node, self.server.public_server, self.server.auto_ip
-                        )
+                        server_ip_or_domain = resolve_server(node, self.server.public_server, self.server.auto_ip)
                         proxy = build_proxy(node, server_ip_or_domain)
                         if proxy:
                             proxies.append(proxy)
@@ -59,9 +57,7 @@ class SubscriptionHandler(BaseHTTPRequestHandler):
                 lines = []
                 for node in nodes:
                     try:
-                        server_ip_or_domain = resolve_server(
-                            node, self.server.public_server, self.server.auto_ip
-                        )
+                        server_ip_or_domain = resolve_server(node, self.server.public_server, self.server.auto_ip)
                         link = build_link(node, server_ip_or_domain)
                         if link:
                             lines.append(link)
@@ -70,7 +66,7 @@ class SubscriptionHandler(BaseHTTPRequestHandler):
                             f"Warning: skipping node '{node.get('name', 'unknown')}': {e}",
                             file=sys.stderr,
                         )
-    
+
                 content = "\n".join(dict.fromkeys(lines)) + ("\n" if lines else "")
                 response_data = b64_plain(content).encode("utf-8")
                 content_type = "text/plain; charset=utf-8"
@@ -101,27 +97,17 @@ class SubscriptionServer(HTTPServer):
         super().__init__(server_address, RequestHandlerClass)
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Serve sing-box inbound configs as a subscription link."
-    )
+def main() -> int | dict:
+    parser = argparse.ArgumentParser(description="Serve sing-box inbound configs as a subscription link.")
     parser.add_argument(
         "--conf-dir",
         default=DEFAULT_CONF_DIR,
         help="directory containing sing-box JSON files",
     )
-    parser.add_argument(
-        "--host", default="0.0.0.0", help="host to listen on (default: 0.0.0.0)"
-    )
-    parser.add_argument(
-        "--port", type=int, default=8080, help="port to listen on (default: 8080)"
-    )
-    parser.add_argument(
-        "--token", required=True, help="token required for the /sabusuku endpoint"
-    )
-    parser.add_argument(
-        "-f", "--foreground", action="store_true", help="run server in foreground"
-    )
+    parser.add_argument("--host", default="0.0.0.0", help="host to listen on (default: 0.0.0.0)")
+    parser.add_argument("--port", type=int, default=8080, help="port to listen on (default: 8080)")
+    parser.add_argument("--token", required=True, help="token required for the /sabusuku endpoint")
+    parser.add_argument("-f", "--foreground", action="store_true", help="run server in foreground")
 
     args = parser.parse_args()
 
@@ -157,7 +143,7 @@ def main() -> int:
         print("Subscription server started in background.")
         print(f"URL: {url}")
         print(f"Clash: {url}&format=clash")
-        return 0
+        return {"url": url, "clash": f"{url}&format=clash"}
 
     server = SubscriptionServer(
         (args.host, args.port),
